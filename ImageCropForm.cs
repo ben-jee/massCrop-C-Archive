@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -22,6 +23,7 @@ namespace WindowsFormsApp1
         private bool isDragging;
         private ResizeMode resizeMode = ResizeMode.None;
         private Point relativeMousePos;
+        private bool isMouseOverRect = false;
 
         public ImageCropForm()
         {
@@ -98,6 +100,17 @@ namespace WindowsFormsApp1
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~MOVE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
+            if (cropRectangle.Contains(e.Location))
+            {
+                isMouseOverRect = true;
+                pictureBox1.Cursor = Cursors.Hand;
+            }
+            else
+            {
+                isMouseOverRect &= false;
+                SetDefaultCursor();
+            }
+
             if (e.Button == MouseButtons.Left)
             {
                 int dx = e.X - previousMouseLocation.X;
@@ -106,18 +119,32 @@ namespace WindowsFormsApp1
                 if (resizeMode == ResizeMode.None)
                 {
                     // Move the rectangle
-                    cropRectangle = new Rectangle(cropRectangle.Left + dx, cropRectangle.Top + dy, cropRectangle.Width, cropRectangle.Height);
+                    cropRectangle.X = Math.Max(0, Math.Min(cropRectangle.X + dx, pictureBox1.Width - cropRectangle.Width));
+                    cropRectangle.Y = Math.Max(0, Math.Min(cropRectangle.Y + dy, pictureBox1.Height - cropRectangle.Height));
                 }
                 else
                 {
-                    // Resize the rectangle
+                    // Calculate the new size while maintaining the 3:4 aspect ratio
+                    int newWidth, newHeight;
                     switch (resizeMode)
                     {
                         case ResizeMode.TopLeft:
-                            cropRectangle = new Rectangle(cropRectangle.Left + dx, cropRectangle.Top + dy, cropRectangle.Width - dx, cropRectangle.Height - dy);
+                            newWidth = cropRectangle.Width - dx;
+                            newHeight = (int)((4.0 / 3.0) * newWidth);
                             break;
-                            // Add cases for other corners if needed
+                        // Add cases for other corners if needed
+                        default:
+                            newWidth = cropRectangle.Width;
+                            newHeight = cropRectangle.Height;
+                            break;
                     }
+
+                    // Calculate the new position of the top-left corner
+                    int newX = cropRectangle.Right - newWidth;
+                    int newY = cropRectangle.Bottom - newHeight;
+
+                    // Update the crop rectangle
+                    cropRectangle = new Rectangle(newX, newY, newWidth, newHeight);
                 }
 
                 pictureBox1.Invalidate();
@@ -126,12 +153,18 @@ namespace WindowsFormsApp1
             previousMouseLocation = e.Location;
         }
 
-    
+
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~UP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
         {
             //mouse up handle
             resizeMode = ResizeMode.None;
+            if (!isCropping && isDragging)
+            {
+                isMouseOverRect = false;
+                SetDefaultCursor();
+            }
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~PAINT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
