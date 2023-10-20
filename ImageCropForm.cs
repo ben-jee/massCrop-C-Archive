@@ -28,10 +28,29 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
 
+        private void SetResizeCursor(ResizeMode mode)
+        {
+            Cursor cursor = Cursors.Default;
+
+            switch (mode)
+            {
+                case ResizeMode.TopLeft:
+                    cursor = Cursors.SizeNWSE;
+                    break;
+            }
+
+            pictureBox1.Cursor = cursor;
+        }
+
+        private void SetDefaultCursor()
+        {
+            pictureBox1.Cursor = Cursors.Default;
+        }
+
         private bool nearLeft(Point mouseLocation)
         {
             //define hit area
-            int hitAreaSize = 10;
+            int hitAreaSize = 15;
             Rectangle hitArea = new Rectangle(cropRectangle.Left - hitAreaSize, cropRectangle.Top - hitAreaSize, hitAreaSize * 2, hitAreaSize * 2); 
 
             return hitArea.Contains(mouseLocation);
@@ -39,8 +58,9 @@ namespace WindowsFormsApp1
 
         private void ImageCropForm_Load(object sender, EventArgs e)
         {
-            //loads image once form loads
-            originalImage = (Bitmap)Bitmap.FromFile(@"C:\Users\benbw\OneDrive\Desktop\ROOT\photo.jpg");
+            //load files AFTER form loaded
+            //studentCSV =
+            originalImage = (Bitmap)Bitmap.FromFile(@"C:\Users\bbouaziz\Desktop\scripts\testIMG.jpg");
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.Image = (Image)originalImage;
 
@@ -50,81 +70,67 @@ namespace WindowsFormsApp1
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~DOWN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
+        private Point previousMouseLocation;
+
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            //mouse down handler for dragging
+            previousMouseLocation = e.Location;
+
             if (cropRectangle.Contains(e.Location))
             {
-                isDragging = true;
-                relativeMousePos = new Point(e.X - cropRectangle.X, e.Y - cropRectangle.Y);
+                if (e.X - cropRectangle.Left < 10 && e.Y - cropRectangle.Top < 10)
+                {
+                    resizeMode = ResizeMode.TopLeft;
+                }
+                // Add cases for other corners if needed
+                else
+                {
+                    resizeMode = ResizeMode.None;
+                }
             }
-
-            //resizing handler
-            if (nearLeft(e.Location))
+            else
             {
-                resizeMode = ResizeMode.TopLeft;
-                relativeMousePos = new Point(cropRectangle.Right - e.X, cropRectangle.Bottom - e.Y);
+                resizeMode = ResizeMode.None;
             }
         }
+
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~MOVE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDragging)
+            if (e.Button == MouseButtons.Left)
             {
-                //calc new drag pos
-                //int newX = e.X - realtiveMousePos.X;
-                //int newY = e.Y - relativeMousePos.Y;
+                int dx = e.X - previousMouseLocation.X;
+                int dy = e.Y - previousMouseLocation.Y;
 
-                //refresh position when dragging
-                cropRectangle.Location = new Point(e.X - relativeMousePos.X, e.Y - relativeMousePos.Y);
-                pictureBox1.Invalidate(); //redraw
-            }
-
-            // Handle mouse move event for resizing the cropper (3:4 aspect ratio)
-            if (isCropping)
-            {
-                int dx = e.X - cropStartPoint.X;
-                int dy = e.Y - cropStartPoint.Y;
-
-                // Force 3:4 aspect ratio
-                int newWidth = cropRectangle.Width + dx;
-                int newHeight = (int)((4.0 / 3.0) * newWidth);
-
-                // Update the croptangle
-                cropRectangle = new Rectangle(cropRectangle.Left, cropRectangle.Top, newWidth, newHeight);
-
-                // Redraw the picture box
-                pictureBox1.Invalidate();
-                cropStartPoint = e.Location;
-            }
-
-            if (resizeMode != ResizeMode.None)
-            {
-                //calc new size
-                int newWidth = cropRectangle.Width;
-                int newHeight = cropRectangle.Height;
-
-                switch (resizeMode)
+                if (resizeMode == ResizeMode.None)
                 {
-                    case ResizeMode.TopLeft:
-                        //calc new width and height for top left resize#
-                        newWidth = cropRectangle.Right - e.X + cropRectangle.Width;
-                        newHeight = (int)((4.0 / 3.0) * newWidth);
-                        break;
+                    // Move the rectangle
+                    cropRectangle = new Rectangle(cropRectangle.Left + dx, cropRectangle.Top + dy, cropRectangle.Width, cropRectangle.Height);
+                }
+                else
+                {
+                    // Resize the rectangle
+                    switch (resizeMode)
+                    {
+                        case ResizeMode.TopLeft:
+                            cropRectangle = new Rectangle(cropRectangle.Left + dx, cropRectangle.Top + dy, cropRectangle.Width - dx, cropRectangle.Height - dy);
+                            break;
+                            // Add cases for other corners if needed
+                    }
                 }
 
-                cropRectangle.Size = new Size(newWidth, newHeight);
                 pictureBox1.Invalidate();
             }
+
+            previousMouseLocation = e.Location;
         }
 
+    
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~UP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
         {
             //mouse up handle
-            isCropping = false;
-            isDragging = false;
             resizeMode = ResizeMode.None;
         }
 

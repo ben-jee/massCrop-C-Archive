@@ -8,3 +8,13 @@ C:\Users\benbw\source\repos\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\WindowsF
 C:\Users\benbw\source\repos\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\WindowsFormsApp1.pdb
 C:\Users\benbw\source\repos\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
 C:\Users\benbw\source\repos\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb
+C:\Users\bbouaziz\Source\Repos\massCrop\bin\Debug\WindowsFormsApp1.exe.config
+C:\Users\bbouaziz\Source\Repos\massCrop\bin\Debug\WindowsFormsApp1.exe
+C:\Users\bbouaziz\Source\Repos\massCrop\bin\Debug\WindowsFormsApp1.pdb
+C:\Users\bbouaziz\Source\Repos\massCrop\obj\Debug\WindowsFormsApp1.csproj.AssemblyReference.cache
+C:\Users\bbouaziz\Source\Repos\massCrop\obj\Debug\WindowsFormsApp1.ImageCropForm.resources
+C:\Users\bbouaziz\Source\Repos\massCrop\obj\Debug\WindowsFormsApp1.Properties.Resources.resources
+C:\Users\bbouaziz\Source\Repos\massCrop\obj\Debug\WindowsFormsApp1.csproj.GenerateResource.cache
+C:\Users\bbouaziz\Source\Repos\massCrop\obj\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
+C:\Users\bbouaziz\Source\Repos\massCrop\obj\Debug\WindowsFormsApp1.exe
+C:\Users\bbouaziz\Source\Repos\massCrop\obj\Debug\WindowsFormsApp1.pdb
